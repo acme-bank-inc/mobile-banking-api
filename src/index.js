@@ -1,8 +1,22 @@
+require('dotenv').config();
+
 const express = require('express');
+const { auth } = require('express-oauth2-jwt-bearer');
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
+
+// Auth0 JWT validation middleware
+const jwtCheck = auth({
+  audience: process.env.AUTH0_AUDIENCE,
+  issuerBaseURL: `https://${process.env.AUTH0_DOMAIN}/`,
+  tokenSigningAlg: 'RS256'
+});
+
+// Protect all /api routes with JWT validation
+app.use('/api', jwtCheck);
 
 // Fake account data
 const accounts = [
